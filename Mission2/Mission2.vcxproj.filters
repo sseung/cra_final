@@ -21,17 +21,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gtest\gtest-all.cc">
+    <ClCompile Include="attendance2.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gmock\gmock-all.cc">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Mission2\attendance_test2.cpp">
+    <ClCompile Include="attendance_test2.cpp">
       <Filter>테스트 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Mission2\attendance2.cpp">
-      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
