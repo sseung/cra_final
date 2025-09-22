@@ -9,6 +9,7 @@
 using namespace std;
 
 const string RESOURCE_FILE = "attendance_weekday_500.txt";
+
 const int MAX_NUM_OF_RESOURCE_DATA = 500;
 const int MAX_NUM_OF_PLAYERS = 20;
 const int MAX_NUM_OF_DAYS = 7;
@@ -115,9 +116,13 @@ void calculatePoint(string name, string day) {
 
 void inputDataFromFile() {
 	ifstream fin{ RESOURCE_FILE };
+	std::cout << "salim " << RESOURCE_FILE << "\n";
+
 	for (int i = 0; i < MAX_NUM_OF_RESOURCE_DATA; i++) {
 		string name, day;
 		fin >> name >> day;
+		std::cout << "salim " << name << " " << day << "\n";
+
 		createPlayerId(name);
 		calculatePoint(name, day);
 	}

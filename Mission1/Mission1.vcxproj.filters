@@ -26,6 +26,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="attendance_weekday_500.txt" />
+    <Text Include="attendance_weekday_500.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
   </ItemGroup>
 </Project>
