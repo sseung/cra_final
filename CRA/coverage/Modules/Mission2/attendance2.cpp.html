@@ -1,0 +1,252 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+        <meta charset="utf-8"/>
+	    <title>attendance2.cpp</title>
+	    <link href="../../third-party/google-code-prettify/prettify-CppCoverage.css" type="text/css" rel="stylesheet" />
+	    <script type="text/javascript" src="../../third-party/google-code-prettify/prettify.js"></script>
+	</head>
+    <body onload="prettyPrint()">
+        <h4></h4>
+        <pre class="prettyprint lang-cpp linenums">
+#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;map&gt;
+#include &lt;algorithm&gt;
+#include "gmock/gmock.h"
+
+using namespace std;
+
+<span style = "background-color:#dfd">const string RESOURCE_FILE = "attendance_weekday_500.txt";</span>
+
+const int MAX_NUM_OF_RESOURCE_DATA = 500;
+const int MAX_NUM_OF_PLAYERS = 20;
+const int MAX_NUM_OF_DAYS = 7;
+
+<span style = "background-color:#dfd">const string MONDAY = "monday";
+const string TUESDAY = "tuesday";
+const string WEDNESDAY = "wednesday";
+const string THURSDAY = "thursday";
+const string FRIDAY = "friday";
+const string SATURDAY = "saturday";
+const string SUNDAY = "sunday";</span>
+
+<span style = "background-color:#dfd">const string GOLD = "GOLD";
+const string SILVER = "SILVER";
+const string NORMAL = "NORMAL";</span>
+
+/* Basic Score per days */
+const int WEDNESDAY_SCORE = 3;
+const int WEEKEND_SCORE = 2;
+const int NORMAL_SCORE = 1;
+
+/* Bonus Score */
+const int WEDNESDAY_ATTENDANCE_COUNT_FOR_BONUS = 10;
+const int BONUS_WEDNESDAY_SCORE = 10;
+const int WEEKEND_ATTENDANCE_COUNT_FOR_BONUS = 10;
+const int BONUS_WEEKEND_SCORE = 10;
+
+/* Grade Score*/
+const int GOLD_SCORE = 50;
+const int SILVER_SCORE = 30;
+
+/* Grade */
+const int GOLD_GRADE = 1;
+const int SILVER_GRADE = 2;
+const int NORMAL_GRADE = 0;
+
+enum class Day {
+	Monday,
+	Tuesday,
+	Wednesday,
+	Thursday,
+	Friday,
+	Saturday,
+	Sunday
+};
+
+<span style = "background-color:#dfd">std::map&lt;std::string, Day&gt; stringToDay = {</span>
+	{MONDAY, Day::Monday},
+	{TUESDAY, Day::Tuesday},
+	{WEDNESDAY, Day::Wednesday},
+	{THURSDAY, Day::Thursday},
+	{FRIDAY, Day::Friday},
+	{SATURDAY, Day::Saturday},
+	{SUNDAY, Day::Sunday}
+<span style = "background-color:#dfd">};</span>
+
+<span style = "background-color:#dfd">std::map&lt;std::string, int&gt; stringToScore = {</span>
+	{MONDAY, NORMAL_SCORE},
+	{TUESDAY, NORMAL_SCORE},
+	{WEDNESDAY, WEDNESDAY_SCORE},
+	{THURSDAY, NORMAL_SCORE},
+	{FRIDAY, NORMAL_SCORE},
+	{SATURDAY, WEEKEND_SCORE},
+	{SUNDAY, WEEKEND_SCORE}
+<span style = "background-color:#dfd">};</span>
+
+<span style = "background-color:#dfd"></span>
+class Player {
+public:
+	int id;
+	string name;
+	int points;
+	int grade;
+<span style = "background-color:#dfd">	vector&lt;string&gt; attendanceDays;</span>
+	bool candidateForRemoval;
+<span style = "background-color:#fdd">};
+
+map&lt;string, int&gt; MapOfplayerNameAndId;
+int NUM_OF_USERS = 0;
+
+//dat[»ç¿ëÀÚID][¿äÀÏ]</span>
+int countOfDay[MAX_NUM_OF_PLAYERS][MAX_NUM_OF_DAYS];
+<span style = "background-color:#fdd">int points[MAX_NUM_OF_PLAYERS];</span>
+int grade[MAX_NUM_OF_PLAYERS];
+<span style = "background-color:#fdd">string names[MAX_NUM_OF_PLAYERS];</span>
+
+<span style = "background-color:#fdd">void createPlayerId(std::string&amp; name) {
+	bool isFirstAppearance = (MapOfplayerNameAndId.count(name) == 0);
+	if (isFirstAppearance) {</span>
+		MapOfplayerNameAndId.insert({ name, ++NUM_OF_USERS });
+<span style = "background-color:#fdd">		if (name == "Daisy") {
+			int debug = 1;
+		}</span>
+		names[NUM_OF_USERS] = name;
+<span style = "background-color:#fdd">	}</span>
+}
+<span style = "background-color:#fdd">
+void increaseDaysForPlayer(int playerId, string&amp; day) {</span>
+	countOfDay[playerId][static_cast&lt;int&gt;(stringToDay[day])] += 1;
+<span style = "background-color:#fdd">}
+
+void increaseScorePerDay(int playerId, std::string&amp; day) {
+	points[playerId] += stringToScore[day];</span>
+}
+<span style = "background-color:#fdd">
+void calculatePoint(string name, string day) {
+	// µð¹ö±ë¿ë
+	if (name == "Daisy") {
+		int debug = 1;
+	}
+	int playerId = MapOfplayerNameAndId[name];
+	increaseDaysForPlayer(playerId, day);
+	increaseScorePerDay(playerId, day);</span>
+}
+<span style = "background-color:#fdd">
+void inputDataFromFile() {
+	ifstream fin{ RESOURCE_FILE };
+	for (int i = 0; i &lt; MAX_NUM_OF_RESOURCE_DATA; i++) {
+		string name, day;</span>
+		fin &gt;&gt; name &gt;&gt; day;
+		createPlayerId(name);
+<span style = "background-color:#fdd">		calculatePoint(name, day);
+
+		shared_ptr&lt;Player&gt; player = make_shared&lt;Player&gt;();</span>
+		player-&gt;name = name;
+<span style = "background-color:#fdd">		player-&gt;attendanceDays.push_back(day);
+	}</span>
+}
+<span style = "background-color:#fdd">
+void calculateBonusPoints() {
+	for (int i = 1; i &lt;= NUM_OF_USERS; i++) {
+		int count_wed_attendance = countOfDay[i][static_cast&lt;int&gt;(Day::Wednesday)];
+		if (count_wed_attendance &gt;= WEDNESDAY_ATTENDANCE_COUNT_FOR_BONUS) {
+			points[i] += BONUS_WEDNESDAY_SCORE;
+		}
+</span>
+		int count_weekend_attendance = countOfDay[i][static_cast&lt;int&gt;(Day::Saturday)] + countOfDay[i][static_cast&lt;int&gt;(Day::Sunday)];
+<span style = "background-color:#fdd">		if (count_weekend_attendance &gt;= WEEKEND_ATTENDANCE_COUNT_FOR_BONUS) {</span>
+			points[i] += BONUS_WEEKEND_SCORE;
+<span style = "background-color:#fdd">		}
+	}</span>
+}
+<span style = "background-color:#fdd">
+void calculateGrades() {
+	for (int i = 1; i &lt;= NUM_OF_USERS; i++) {
+		if (points[i] &gt;= GOLD_SCORE) {
+			grade[i] = GOLD_GRADE;</span>
+		}
+<span style = "background-color:#fdd">		else if (points[i] &gt;= SILVER_SCORE) {
+			grade[i] = SILVER_GRADE;
+		}
+		else {
+			grade[i] = NORMAL_GRADE;
+		}</span>
+	}
+<span style = "background-color:#fdd">}</span>
+
+<span style = "background-color:#fdd">void printPointsAndGradesOfPlayers() {
+	for (int i = 1; i &lt;= NUM_OF_USERS; i++) {</span>
+		cout &lt;&lt; "NAME : " &lt;&lt; names[i] &lt;&lt; ", ";
+<span style = "background-color:#fdd">		cout &lt;&lt; "POINT : " &lt;&lt; points[i] &lt;&lt; ", ";
+		cout &lt;&lt; "GRADE : ";
+</span>
+		if (grade[i] == GOLD_GRADE) {
+<span style = "background-color:#fdd">			cout &lt;&lt; GOLD &lt;&lt; "\n";
+		}
+		else if (grade[i] == SILVER_GRADE) {</span>
+			cout &lt;&lt; SILVER &lt;&lt; "\n";
+<span style = "background-color:#fdd">		}
+		else {</span>
+			cout &lt;&lt; NORMAL &lt;&lt; "\n";
+<span style = "background-color:#fdd">		}
+	}
+}
+</span>
+bool needToRemove(int i) {
+<span style = "background-color:#fdd">	int count_wed_attendance = countOfDay[i][static_cast&lt;int&gt;(Day::Wednesday)];
+	int count_weekend_attendance = countOfDay[i][static_cast&lt;int&gt;(Day::Saturday)] + countOfDay[i][static_cast&lt;int&gt;(Day::Sunday)];
+</span>
+	bool isNormalGrade = (grade[i] == NORMAL_GRADE);
+<span style = "background-color:#fdd">	bool isWedAttendZero = (count_wed_attendance == 0);
+	bool isWeekendAttendZero = (count_weekend_attendance == 0);</span>
+
+<span style = "background-color:#dfd">	return isNormalGrade &amp;&amp; isWedAttendZero &amp;&amp; isWeekendAttendZero;</span>
+}
+
+void printRemovedPlayer() {
+	std::cout &lt;&lt; "\n";
+	std::cout &lt;&lt; "Removed player\n";
+	std::cout &lt;&lt; "==============\n";
+
+<span style = "background-color:#dfd">	for (int i = 1; i &lt;= NUM_OF_USERS; i++) {
+		if (needToRemove(i)) {</span>
+			std::cout &lt;&lt; names[i] &lt;&lt; "\n";
+		}
+<span style = "background-color:#dfd">	}</span>
+<span style = "background-color:#fdd">}</span>
+
+int main() {
+#ifndef _DEBUG
+	inputDataFromFile();
+	calculateBonusPoints();
+	calculateGrades();
+	printPointsAndGradesOfPlayers();
+	printRemovedPlayer();
+
+
+
+#else // _RELEASE
+	testing::InitGoogleTest();
+	return RUN_ALL_TESTS();
+#endif
+
+}</pre>
+        <hr />
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th align="center">
+                        <small>Generated by</small>
+                        <a href="https://github.com/OpenCppCoverage/OpenCppCoverage/releases">
+                            <strong>OpenCppCoverage (Version: 0.9.9.0)</strong>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </body>
+</html>

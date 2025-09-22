@@ -46,6 +46,19 @@ const int GOLD_GRADE = 1;
 const int SILVER_GRADE = 2;
 const int NORMAL_GRADE = 0;
 
+struct Player {
+public:
+	int id;
+	string name;
+	vector<string> attendanceDays;
+	bool candidateForRemoval;
+	int score;
+	int grade;
+};
+
+//std::vector<Player> players;
+std::map<std::string, Player> players;
+
 enum class Day {
 	Monday,
 	Tuesday,
@@ -116,15 +129,29 @@ void calculatePoint(string name, string day) {
 
 void inputDataFromFile() {
 	ifstream fin{ RESOURCE_FILE };
-	std::cout << "salim " << RESOURCE_FILE << "\n";
-
 	for (int i = 0; i < MAX_NUM_OF_RESOURCE_DATA; i++) {
 		string name, day;
 		fin >> name >> day;
-		std::cout << "salim " << name << " " << day << "\n";
-
 		createPlayerId(name);
 		calculatePoint(name, day);
+	}
+}
+
+void input() {
+	ifstream fin{ RESOURCE_FILE };
+	for (int i = 0; i < MAX_NUM_OF_RESOURCE_DATA; i++) {
+		string name, day;
+		fin >> name >> day;
+
+		if (players.find(name) != players.end()) {
+			players[name].attendanceDays.push_back(day);
+			continue;
+		}
+
+		std::shared_ptr<Player> player = make_shared<Player>();
+		player->id = i + 1;
+		player->name = name;
+		player->attendanceDays.push_back(day);
 	}
 }
 
@@ -156,7 +183,7 @@ void calculateGrades() {
 	}
 }
 
-void printPointsAndGradesOfPlayers() {
+void print() {
 	for (int i = 1; i <= NUM_OF_USERS; i++) {
 		cout << "NAME : " << names[i] << ", ";
 		cout << "POINT : " << points[i] << ", ";
@@ -196,12 +223,29 @@ void printRemovedPlayer() {
 	}
 }
 
+
+/* salim start */
+
+int calculateTotalScore(std::vector<string> days) {
+	int totalScore = 0;
+	for (const auto& day : days) {
+		totalScore += stringToScore[day];
+	}
+	return totalScore;
+}
+/* salim end*/
+
+#if 0
 int main() {
 #ifndef _DEBUG
+
 	inputDataFromFile();
+	//input();
+	
+
 	calculateBonusPoints();
 	calculateGrades();
-	printPointsAndGradesOfPlayers();
+	print();
 	printRemovedPlayer();
 #else // _RELEASE
 	testing::InitGoogleTest();
@@ -209,3 +253,4 @@ int main() {
 #endif
 
 }
+#endif

@@ -130,11 +130,16 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Mission1\attendance.cpp" />
-    <ClCompile Include="..\Mission1\attendance_test.cpp" />
+    <ClCompile Include="..\Mission1\attendance2.cpp" />
+    <ClCompile Include="..\Mission1\attendance_test2.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'"> %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\Mission1\attendance_weekday_500.txt" />
+    <Text Include="attendance_weekday_500.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="attendance2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
