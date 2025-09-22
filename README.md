@@ -9,11 +9,11 @@
 
 ####D1 ~ D5 체크리스트 작성하였습니다.
 
--[x] D1   
--[x] D2   
--[x] D3   
--[x] D4   
--[x] D5   
+- [x] D1. 완료   
+- [x] D2. 완료 
+- [x] D3. 완료  
+- [x] D4. 완료  
+- [x] D5. 완료  
 
 #### Coverage Report 최종 화면 입니다.
 <img width="1516" height="586" alt="image" src="https://github.com/user-attachments/assets/122850ac-e7f7-4fd9-9f76-2bac0e647292" />
