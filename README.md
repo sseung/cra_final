@@ -11,3 +11,5 @@ D1 ~ D5 체크리스트 작성하였습니다.
 -[x] D3
 -[x] D4
 -[x] D5
+
+<img width="1516" height="586" alt="image" src="https://github.com/user-attachments/assets/122850ac-e7f7-4fd9-9f76-2bac0e647292" />
