@@ -132,14 +132,14 @@
   <ItemGroup>
     <ClCompile Include="..\Mission1\attendance2.cpp" />
     <ClCompile Include="..\Mission1\attendance_test2.cpp">
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'"> %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">  %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="attendance_weekday_500.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="attendance2.h" />
+    <ClInclude Include="attendance.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

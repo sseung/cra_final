@@ -40,8 +40,8 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="attendance2.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="attendance.h">
+      <Filter>소스 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

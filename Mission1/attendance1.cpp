@@ -223,26 +223,9 @@ void printRemovedPlayer() {
 	}
 }
 
-
-/* salim start */
-
-int calculateTotalScore(std::vector<string> days) {
-	int totalScore = 0;
-	for (const auto& day : days) {
-		totalScore += stringToScore[day];
-	}
-	return totalScore;
-}
-/* salim end*/
-
-#if 0
 int main() {
 #ifndef _DEBUG
-
 	inputDataFromFile();
-	//input();
-	
-
 	calculateBonusPoints();
 	calculateGrades();
 	print();
@@ -251,6 +234,5 @@ int main() {
 	testing::InitGoogleTest();
 	return RUN_ALL_TESTS();
 #endif
-
 }
-#endif
+

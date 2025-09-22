@@ -10,11 +10,161 @@
         <h4></h4>
         <pre class="prettyprint lang-cpp linenums">
 #include "gmock/gmock.h"
-//#include "attendance2.cpp"
+#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;memory&gt;
+#include &lt;iostream&gt;
+#include "../Mission2/attendance.h"
 
-<span style = "background-color:#dfd">TEST(AttendanceTest, SampleTest) {</span>
+using namespace std;
 
-<span style = "background-color:#dfd">	EXPECT_EQ(1 + 1, 2);
+class MockScorePolicy : public IScorePolicy {
+public:
+<span style = "background-color:#dfd">    MOCK_METHOD(int, calculateScore, (const vector&lt;string&gt;&amp; attendance), (const, override));</span>
+};
+
+class MockGradePolicy : public IGradePolicy {
+public:
+<span style = "background-color:#dfd">    MOCK_METHOD(int, determineGrade, (int score), (const, override));</span>
+};
+
+<span style = "background-color:#dfd">TEST(AttendanceManagerTest, AddPlayerAndProcess) {
+    auto mockScorePolicy = make_unique&lt;MockScorePolicy&gt;();
+    auto mockGradePolicy = make_unique&lt;MockGradePolicy&gt;();</span>
+
+<span style = "background-color:#dfd">    EXPECT_CALL(*mockScorePolicy, calculateScore(::testing::_))</span>
+        .WillRepeatedly(::testing::Return(10));
+<span style = "background-color:#dfd">    EXPECT_CALL(*mockGradePolicy, determineGrade(::testing::_))</span>
+        .WillRepeatedly(::testing::Return(SILVER_GRADE));
+
+<span style = "background-color:#dfd">    AttendanceManager manager(move(mockScorePolicy), move(mockGradePolicy));</span>
+
+<span style = "background-color:#dfd">    Player player1(1, "Alice", { MONDAY, WEDNESDAY });
+    Player player2(2, "Bob", { SATURDAY, SUNDAY });
+    manager.addPlayer(player1);
+    manager.addPlayer(player2);</span>
+
+<span style = "background-color:#dfd">    manager.process();</span>
+
+    //
+<span style = "background-color:#dfd">    const auto&amp; players = manager.getPlayers();
+    ASSERT_EQ(players.size(), 2);
+    EXPECT_EQ(players[0].name, "Alice");
+    EXPECT_EQ(players[0].score, 10);
+    EXPECT_EQ(players[0].grade, SILVER_GRADE);
+    EXPECT_EQ(players[1].name, "Bob");
+    EXPECT_EQ(players[1].score, 10);
+    EXPECT_EQ(players[1].grade, SILVER_GRADE);
+}</span>
+
+<span style = "background-color:#dfd">TEST(AttendanceManagerTest, ProcessPlayers) {
+    auto mockScorePolicy = make_unique&lt;MockScorePolicy&gt;();
+    auto mockGradePolicy = make_unique&lt;MockGradePolicy&gt;();</span>
+
+<span style = "background-color:#dfd">    EXPECT_CALL(*mockScorePolicy, calculateScore(::testing::_))</span>
+        .WillOnce(::testing::Return(100))
+        .WillOnce(::testing::Return(50));
+
+<span style = "background-color:#dfd">    EXPECT_CALL(*mockGradePolicy, determineGrade(100))</span>
+        .WillOnce(::testing::Return(GOLD_GRADE));
+<span style = "background-color:#dfd">    EXPECT_CALL(*mockGradePolicy, determineGrade(50))</span>
+        .WillOnce(::testing::Return(SILVER_GRADE));
+
+<span style = "background-color:#dfd">    AttendanceManager manager(move(mockScorePolicy), move(mockGradePolicy));</span>
+
+<span style = "background-color:#dfd">    Player player1(1, "Alice", { "Monday", "Wednesday", "Saturday" });
+    Player player2(2, "Bob", { "Tuesday", "Sunday" });</span>
+
+<span style = "background-color:#dfd">    manager.addPlayer(player1);
+    manager.addPlayer(player2);</span>
+
+<span style = "background-color:#dfd">    manager.process();</span>
+
+<span style = "background-color:#dfd">    const auto&amp; players = manager.getPlayers();
+    EXPECT_EQ(players[0].score, 100);
+    EXPECT_EQ(players[0].grade, GOLD_GRADE);
+    EXPECT_EQ(players[1].score, 50);
+    EXPECT_EQ(players[1].grade, SILVER_GRADE);
+}</span>
+
+<span style = "background-color:#dfd">TEST(AttendanceManagerTest, CheckElimination) {</span>
+    // Arrange
+<span style = "background-color:#dfd">    auto mockScorePolicy = make_unique&lt;MockScorePolicy&gt;();
+    auto mockGradePolicy = make_unique&lt;MockGradePolicy&gt;();</span>
+
+<span style = "background-color:#dfd">    EXPECT_CALL(*mockScorePolicy, calculateScore(::testing::_))</span>
+        .WillRepeatedly(::testing::Return(5));
+<span style = "background-color:#dfd">    EXPECT_CALL(*mockGradePolicy, determineGrade(::testing::_))</span>
+        .WillRepeatedly(::testing::Return(NORMAL_GRADE));
+
+<span style = "background-color:#dfd">    AttendanceManager manager(move(mockScorePolicy), move(mockGradePolicy));</span>
+
+<span style = "background-color:#dfd">    Player player1(1, "Charlie", { MONDAY, TUESDAY });
+    Player player2(2, "Dave", { WEDNESDAY, SATURDAY });
+    manager.addPlayer(player1);
+    manager.addPlayer(player2);</span>
+
+<span style = "background-color:#dfd">    manager.process();</span>
+
+    // Act and Assert
+<span style = "background-color:#dfd">    const auto&amp; players = manager.getPlayers();
+    ASSERT_EQ(players.size(), 2);
+    EXPECT_TRUE(players[0].eliminationCandidate);
+    EXPECT_FALSE(players[1].eliminationCandidate); 
+}</span>
+
+<span style = "background-color:#dfd">TEST(AttendanceManagerTest, PrintResult) {
+    auto mockScorePolicy = make_unique&lt;MockScorePolicy&gt;();
+    auto mockGradePolicy = make_unique&lt;MockGradePolicy&gt;();</span>
+
+<span style = "background-color:#dfd">    AttendanceManager manager(move(mockScorePolicy), move(mockGradePolicy));</span>
+
+<span style = "background-color:#dfd">    Player player1(1, "Alice", { "Monday", "Wednesday", "Saturday" });
+    Player player2(2, "Bob", { "Tuesday", "Sunday" });</span>
+
+<span style = "background-color:#dfd">    manager.addPlayer(player1);
+    manager.addPlayer(player2);</span>
+
+<span style = "background-color:#dfd">    testing::internal::CaptureStdout();
+    printResult(manager.getPlayers());
+    string output = testing::internal::GetCapturedStdout();</span>
+
+<span style = "background-color:#dfd">    EXPECT_THAT(output, ::testing::HasSubstr("NAME : Alice"));
+    EXPECT_THAT(output, ::testing::HasSubstr("NAME : Bob"));
+}</span>
+
+<span style = "background-color:#dfd">TEST(AttendanceManagerTest, CalculateScore) {
+    DefaultScorePolicy scorePolicy;</span>
+
+<span style = "background-color:#dfd">    vector&lt;string&gt; attendance1 = { MONDAY, WEDNESDAY, SATURDAY };
+    vector&lt;string&gt; attendance2 = { WEDNESDAY, WEDNESDAY, SUNDAY, SUNDAY };</span>
+
+<span style = "background-color:#dfd">    int score1 = scorePolicy.calculateScore(attendance1);
+    int score2 = scorePolicy.calculateScore(attendance2);</span>
+
+<span style = "background-color:#dfd">    EXPECT_EQ(score1, NORMAL_SCORE + WEDNESDAY_SCORE + WEEKEND_SCORE);
+}</span>
+
+<span style = "background-color:#dfd">TEST(AttendanceManagerTest, PrintRemovedPlayer) {
+    Player player1(1, "Alice", { MONDAY, TUESDAY });
+    Player player2(2, "Bob", { WEDNESDAY, SATURDAY });
+	Player player3(3, "Charlie", { MONDAY, TUESDAY });</span>
+
+<span style = "background-color:#dfd">	vector&lt;Player&gt; players = { player1, player2, player3 };</span>
+
+<span style = "background-color:#dfd">    testing::internal::CaptureStdout();
+    printRemovedPlayer(players);
+    string output = testing::internal::GetCapturedStdout();</span>
+
+<span style = "background-color:#dfd">    EXPECT_THAT(output, ::testing::HasSubstr("Removed player"));
+}</span>
+
+<span style = "background-color:#dfd">TEST(AttendanceManagerTest, DetermineGrade) {
+	DefaultGradePolicy gradePolicy;</span>
+
+<span style = "background-color:#dfd">	EXPECT_EQ(gradePolicy.determineGrade(60), GOLD_GRADE);
+	EXPECT_EQ(gradePolicy.determineGrade(40), SILVER_GRADE);
+	EXPECT_EQ(gradePolicy.determineGrade(20), NORMAL_GRADE);
 }</span></pre>
         <hr />
         <table width="100%">
